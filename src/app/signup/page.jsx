@@ -1,18 +1,35 @@
 "use client";
 import { signUp } from "@/services/user";
-import { Button, Form, Input, Typography } from "antd";
+import { Button, Flex, Form, Input, Typography } from "antd";
 import Link from "antd/es/typography/Link";
 import Paragraph from "antd/es/typography/Paragraph";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 const Signup = () => {
+  const [loadings, setLoadings] = useState([]);
   const {
     handleSubmit,
     control,
     formState: { errors },
   } = useForm();
   const navigate = useRouter();
+
+  const enterLoading = (index) => {
+    setLoadings((prevLoadings) => {
+      const newLoadings = [...prevLoadings];
+      newLoadings[index] = true;
+      return newLoadings;
+    });
+    setTimeout(() => {
+      setLoadings((prevLoadings) => {
+        const newLoadings = [...prevLoadings];
+        newLoadings[index] = false;
+        return newLoadings;
+      });
+    }, 3000);
+  };
 
   const handleOnFormSubmit = async (data) => {
     const response = await signUp(data);
@@ -80,7 +97,7 @@ const Signup = () => {
           )}
         </Form.Item>
 
-        <Form.Item>
+        <Form.Item style={{ marginBottom: "10px" }}>
           <Controller
             control={control}
             name="password"
@@ -104,19 +121,23 @@ const Signup = () => {
           )}
         </Form.Item>
 
-        <div className="flex gap-1">
+        <Flex gap={3}>
           <Typography>
             <Paragraph>
               <p>Already have an account?</p>
             </Paragraph>
           </Typography>
           <Link onClick={() => navigate.push("/login")}>Login</Link>
-        </div>
-        <Form.Item label={null}>
-          <Button type="primary" htmlType="submit">
-            Signup
-          </Button>
-        </Form.Item>
+        </Flex>
+
+        <Button
+          type="primary"
+          loading={loadings[0]}
+          onClick={() => enterLoading(0)}
+          htmlType="submit"
+        >
+          Signup
+        </Button>
       </Form>
     </div>
   );

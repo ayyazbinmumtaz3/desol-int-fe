@@ -29,6 +29,7 @@ const Car = () => {
   const [imageCount, setImageCount] = useState(1);
   const [fileList, setFileList] = useState([]);
   const [formData, setFormData] = useState(null);
+  const [loadings, setLoadings] = useState([]);
   const {
     handleSubmit,
     control,
@@ -57,6 +58,21 @@ const Car = () => {
     });
     setImageCount(1);
     setFileList([]);
+  };
+
+  const enterLoading = (index) => {
+    setLoadings((prevLoadings) => {
+      const newLoadings = [...prevLoadings];
+      newLoadings[index] = true;
+      return newLoadings;
+    });
+    setTimeout(() => {
+      setLoadings((prevLoadings) => {
+        const newLoadings = [...prevLoadings];
+        newLoadings[index] = false;
+        return newLoadings;
+      });
+    }, 3000);
   };
 
   const handleOnFormSubmit = async (data) => {
@@ -107,15 +123,15 @@ const Car = () => {
       <Form
         name="basic"
         labelCol={{
-          span: 8,
+          span: 7,
         }}
         wrapperCol={{
-          span: 16,
+          span: 12,
         }}
-        style={{ width: "60%", margin: "auto", padding: "20px" }}
+        style={{ width: "80%", margin: "auto", padding: "20px" }}
         onFinish={handleSubmit(handleOnFormSubmit)}
       >
-        <Form.Item label="Car Model">
+        <Form.Item label="Car Model" style={{ marginBottom: "10px" }}>
           <Controller
             control={control}
             name="model"
@@ -143,7 +159,7 @@ const Car = () => {
           />
         </Form.Item>
 
-        <Form.Item label="Price">
+        <Form.Item label="Price" style={{ marginBottom: "10px" }}>
           <Controller
             control={control}
             name="price"
@@ -171,7 +187,7 @@ const Car = () => {
           />
         </Form.Item>
 
-        <Form.Item label="Phone Number">
+        <Form.Item label="Phone Number" style={{ marginBottom: "10px" }}>
           <Controller
             control={control}
             name="phoneNumber"
@@ -199,7 +215,7 @@ const Car = () => {
           />
         </Form.Item>
 
-        <Form.Item label="City">
+        <Form.Item label="City" style={{ marginBottom: "10px" }}>
           <Controller
             control={control}
             name="city"
@@ -213,7 +229,7 @@ const Car = () => {
           />
         </Form.Item>
 
-        <Form.Item label="Number of Images">
+        <Form.Item label="Number of Images" style={{ marginBottom: "10px" }}>
           <Select
             defaultValue={1}
             onChange={(value) => setImageCount(value)}
@@ -254,16 +270,19 @@ const Car = () => {
             </Form.Item>
           )}
         />
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            Add Car
-          </Button>
-        </Form.Item>
+        {/* <Button type="primary">Add Car</Button> */}
+        <Button
+          htmlType="submit"
+          type="primary"
+          loading={loadings[0]}
+          onClick={() => enterLoading(0)}
+        >
+          Submit
+        </Button>
       </Form>
 
       {formData && (
         <div style={{ margin: "40px" }}>
-          <h3>Form Data in Table:</h3>
           <Table
             dataSource={[formData]}
             columns={columns}

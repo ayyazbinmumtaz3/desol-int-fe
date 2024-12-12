@@ -1,12 +1,14 @@
 "use client";
 import { login } from "@/services/user";
-import { Button, Form, Input, message, Typography } from "antd";
+import { Button, Flex, Form, Input, message, Typography } from "antd";
 import Link from "antd/es/typography/Link";
 import Paragraph from "antd/es/typography/Paragraph";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 const Login = () => {
+  const [loadings, setLoadings] = useState([]);
   const {
     handleSubmit,
     control,
@@ -14,14 +16,33 @@ const Login = () => {
   } = useForm();
   const navigate = useRouter();
 
-  const handleOnFormSubmit = async (data) => {
-    const response = await login(data);
+  const enterLoading = (index) => {
+    setLoadings((prevLoadings) => {
+      const newLoadings = [...prevLoadings];
+      newLoadings[index] = true;
+      return newLoadings;
+    });
+    setTimeout(() => {
+      setLoadings((prevLoadings) => {
+        const newLoadings = [...prevLoadings];
+        newLoadings[index] = false;
+        return newLoadings;
+      });
+    }, 3000);
+  };
 
-    if (response.status >= 200 && response.status <= 300) {
-      message.success("Signin Successfully");
-      navigate.push("/car");
-    } else {
-      return message.error("Error while logging in");
+  const handleOnFormSubmit = async (data) => {
+    try {
+      const response = await login(data);
+
+      if (response.status >= 200 && response.status <= 300) {
+        message.success("Signin Successfully");
+        navigate.push("/car");
+      } else {
+        message.error("Error while logging in");
+      }
+    } catch (error) {
+      message.error("Something went wrong. Please try again.");
     }
   };
 
@@ -90,14 +111,19 @@ const Login = () => {
           )}
         </Form.Item>
 
-        <div className="flex gap-1">
+        <Flex gap={3}>
           <Typography>
             <Paragraph>Create an account!</Paragraph>
           </Typography>
           <Link onClick={() => navigate.push("/signup")}>Signup</Link>
-        </div>
+        </Flex>
 
-        <Button type="primary" htmlType="submit">
+        <Button
+          htmlType="submit"
+          type="primary"
+          loading={loadings[0]}
+          onClick={() => enterLoading(0)}
+        >
           Login
         </Button>
       </Form>
