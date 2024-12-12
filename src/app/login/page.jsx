@@ -42,7 +42,7 @@ const Login = () => {
         }}
         onFinish={handleSubmit(handleOnFormSubmit)}
       >
-        <div className="flex flex-col gap-2">
+        <Form.Item style={{ marginBottom: "10px" }}>
           <Controller
             control={control}
             name="email"
@@ -65,6 +65,8 @@ const Login = () => {
           {errors.email && (
             <p className="text-red-500">{errors.email.message}</p>
           )}
+        </Form.Item>
+        <Form.Item style={{ marginBottom: "10px" }}>
           <Controller
             control={control}
             name="password"
@@ -86,13 +88,15 @@ const Login = () => {
           {errors.password && (
             <p className="text-red-500">{errors.password.message}</p>
           )}
-          <div className="flex gap-1">
-            <Typography>
-              <Paragraph>Create an account!</Paragraph>
-            </Typography>
-            <Link onClick={() => navigate.push("/signup")}>Signup</Link>
-          </div>
+        </Form.Item>
+
+        <div className="flex gap-1">
+          <Typography>
+            <Paragraph>Create an account!</Paragraph>
+          </Typography>
+          <Link onClick={() => navigate.push("/signup")}>Signup</Link>
         </div>
+
         <Button type="primary" htmlType="submit">
           Login
         </Button>
