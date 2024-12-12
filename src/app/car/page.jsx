@@ -113,7 +113,15 @@ const Car = () => {
           <Controller
             control={control}
             name="model"
-            rules={[{ required: "Car model is required" }]}
+            rules={[
+              { required: "Car model is required" },
+              {
+                minLength: {
+                  value: 3,
+                  message: "Car model must be at least 3 characters",
+                },
+              },
+            ]}
             render={({ field, fieldState }) => (
               <Input
                 placeholder="Enter car model"
@@ -128,7 +136,15 @@ const Car = () => {
           <Controller
             control={control}
             name="price"
-            rules={{ required: "Price is required" }}
+            rules={[
+              { required: "Price is required" },
+              {
+                pattern: {
+                  value: /^[0-9]+$/,
+                  message: "Price must be a valid number",
+                },
+              },
+            ]}
             render={({ field, fieldState }) => (
               <Input
                 placeholder="Enter car price"
@@ -143,7 +159,15 @@ const Car = () => {
           <Controller
             control={control}
             name="phoneNumber"
-            rules={{ required: "Phone number is required" }}
+            rules={[
+              { required: "Phone number is required" },
+              {
+                pattern: {
+                  value: /^[0-9]{11}$/,
+                  message: "Phone number must be exactly 11 digits",
+                },
+              },
+            ]}
             render={({ field, fieldState }) => (
               <Input
                 placeholder="Enter phone number"
