@@ -29,7 +29,13 @@ const Car = () => {
   const [imageCount, setImageCount] = useState(1);
   const [fileList, setFileList] = useState([]);
   const [formData, setFormData] = useState(null);
-  const { handleSubmit, control, setValue, reset } = useForm();
+  const {
+    handleSubmit,
+    control,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm();
 
   const onChange = (info) => {
     if (info.file.status === "done") {
@@ -113,21 +119,26 @@ const Car = () => {
           <Controller
             control={control}
             name="model"
-            rules={[
-              { required: "Car model is required" },
-              {
-                minLength: {
-                  value: 3,
-                  message: "Car model must be at least 3 characters",
-                },
+            rules={{
+              required: "Car model is required",
+              minLength: {
+                value: 3,
+                message: "Car model must be at least 3 characters",
               },
-            ]}
+            }}
             render={({ field, fieldState }) => (
-              <Input
-                placeholder="Enter car model"
-                {...field}
-                status={fieldState.invalid ? "error" : ""}
-              />
+              <>
+                <Input
+                  placeholder="Enter car model"
+                  {...field}
+                  status={fieldState.invalid ? "error" : ""}
+                />
+                {fieldState.invalid && (
+                  <span className="text-red-500">
+                    {fieldState?.error?.message}
+                  </span>
+                )}
+              </>
             )}
           />
         </Form.Item>
@@ -136,21 +147,26 @@ const Car = () => {
           <Controller
             control={control}
             name="price"
-            rules={[
-              { required: "Price is required" },
-              {
-                pattern: {
-                  value: /^[0-9]+$/,
-                  message: "Price must be a valid number",
-                },
+            rules={{
+              required: "Price is required",
+              pattern: {
+                value: /^[0-9]+$/,
+                message: "Price must be a valid number",
               },
-            ]}
+            }}
             render={({ field, fieldState }) => (
-              <Input
-                placeholder="Enter car price"
-                {...field}
-                status={fieldState.invalid ? "error" : ""}
-              />
+              <>
+                <Input
+                  placeholder="Enter car price"
+                  {...field}
+                  status={fieldState.invalid ? "error" : ""}
+                />
+                {fieldState.invalid && (
+                  <span className="text-red-500">
+                    {fieldState?.error?.message}
+                  </span>
+                )}
+              </>
             )}
           />
         </Form.Item>
@@ -159,21 +175,26 @@ const Car = () => {
           <Controller
             control={control}
             name="phoneNumber"
-            rules={[
-              { required: "Phone number is required" },
-              {
-                pattern: {
-                  value: /^[0-9]{11}$/,
-                  message: "Phone number must be exactly 11 digits",
-                },
+            rules={{
+              required: "Phone number is required",
+              pattern: {
+                value: /^[0-9]{11}$/,
+                message: "Phone number must be exactly 11 digits",
               },
-            ]}
+            }}
             render={({ field, fieldState }) => (
-              <Input
-                placeholder="Enter phone number"
-                {...field}
-                status={fieldState.invalid ? "error" : ""}
-              />
+              <>
+                <Input
+                  placeholder="Enter phone number"
+                  {...field}
+                  status={fieldState.invalid ? "error" : ""}
+                />
+                {fieldState.invalid && (
+                  <span className="text-red-500">
+                    {fieldState?.error?.message}
+                  </span>
+                )}
+              </>
             )}
           />
         </Form.Item>
