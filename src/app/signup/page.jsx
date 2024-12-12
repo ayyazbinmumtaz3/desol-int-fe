@@ -7,7 +7,11 @@ import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 
 const Signup = () => {
-  const { handleSubmit, control } = useForm();
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm();
   const navigate = useRouter();
 
   const handleOnFormSubmit = async (data) => {
@@ -18,53 +22,81 @@ const Signup = () => {
     }
   };
   return (
-    <div className="flex flex-col justify-center items-center h-dvh">
-      {/* <Typography>
-        <Title level={3}>Sign Up</Title>
-      </Typography> */}
-      <form onSubmit={handleSubmit(handleOnFormSubmit)}>
-        <div className="flex flex-col gap-2">
-          <Controller
-            control={control}
-            name="fullName"
-            render={({ field: { onChange, value } }) => (
-              <Input
-                required={true}
-                onChange={onChange}
-                value={value}
-                placeholder="Enter your name"
-              />
-            )}
-          />
+    <div className="flex flex-col items-center justify-center h-dvh">
+      <Form
+        style={{ width: "30%", margin: "auto", padding: "20px" }}
+        onFinish={handleSubmit(handleOnFormSubmit)}
+      >
+        <Controller
+          control={control}
+          name="fullName"
+          rules={{
+            required: "Full name is required",
+            minLength: {
+              value: 2,
+              message: "Full name must be at least 2 characters",
+            },
+            maxLength: {
+              value: 20,
+              message: "Full name can't be more than 20 characters",
+            },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <Input
+              onChange={onChange}
+              value={value}
+              placeholder="Enter your name"
+            />
+          )}
+        />
 
-          <Controller
-            control={control}
-            name="email"
-            render={({ field: { onChange, value } }) => (
-              <Input
-                type="email"
-                required={true}
-                placeholder="Enter your email"
+        {errors.fullName && (
+          <p className="text-red-500">{errors.fullName.message}</p>
+        )}
+
+        <Controller
+          control={control}
+          name="email"
+          rules={{
+            required: "Email is required",
+            pattern: {
+              value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/,
+              message: "Please enter a valid email address",
+            },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <Input
+              type="email"
+              placeholder="Enter your email"
+              onChange={onChange}
+              value={value}
+            />
+          )}
+        />
+        {errors.email && <p className="text-red-500">{errors.email.message}</p>}
+        <Controller
+          control={control}
+          name="password"
+          rules={{
+            required: "Password is required",
+            minLength: {
+              value: 5,
+              message: "Password must be at least 5 characters",
+            },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <Form.Item>
+              <Input.Password
                 onChange={onChange}
                 value={value}
+                placeholder="Enter your password"
               />
-            )}
-          />
-          <Controller
-            control={control}
-            name="password"
-            render={({ field: { onChange, value } }) => (
-              <Form.Item>
-                <Input.Password
-                  onChange={onChange}
-                  value={value}
-                  placeholder="Enter your password"
-                  required={true}
-                />
-              </Form.Item>
-            )}
-          />
-        </div>
+            </Form.Item>
+          )}
+        />
+        {errors.password && (
+          <p className="text-red-500">{errors.password.message}</p>
+        )}
 
         <div className="flex gap-1">
           <Typography>
@@ -79,7 +111,7 @@ const Signup = () => {
             Signup
           </Button>
         </Form.Item>
-      </form>
+      </Form>
     </div>
   );
 };

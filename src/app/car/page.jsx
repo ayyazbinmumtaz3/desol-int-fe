@@ -7,7 +7,6 @@ import {
   Form,
   Input,
   message,
-  notification,
   Radio,
   Select,
   Table,
@@ -30,49 +29,48 @@ const Car = () => {
   const [imageCount, setImageCount] = useState(1);
   const [fileList, setFileList] = useState([]);
   const [formData, setFormData] = useState(null);
-  const { handleSubmit, control, setValue } = useForm();
-
-  const openNotificationWithIcon = (type) => {
-    notification[type]({
-      message: "Notification Title",
-      description:
-        "This is the content of the notification. This is the content of the notification. This is the content of the notification.",
-    });
-  };
+  const { handleSubmit, control, setValue, reset } = useForm();
 
   const onChange = (info) => {
     if (info.file.status === "done") {
       setValue("images", info.fileList);
-      message.success("success");
+      message.success("Image uploaded successfully");
     } else if (info.file.status === "error") {
-      message.error("error");
+      message.error("Error uploading image");
     }
     setFileList(info.fileList);
   };
 
+  const resetForm = () => {
+    reset({
+      model: "",
+      price: "",
+      phoneNumber: "",
+      city: "Lahore",
+      images: [],
+    });
+    setImageCount(1);
+    setFileList([]);
+  };
+
   const handleOnFormSubmit = async (data) => {
     try {
-      const images =
-        data.images && data.images.length > 0
-          ? await Promise.all(
-              data.images.map((image) => getBase64(image.originFileObj))
-            )
-          : [];
-
-      console.log("Submitting data: ", { ...data, images });
-
+      const images = data.images?.length
+        ? await Promise.all(
+            data.images.map((image) => getBase64(image.originFileObj))
+          )
+        : [];
       const response = await addCar({ ...data, images });
 
-      if (response.status >= 200 && response.status < 300) {
-        message.success("Car added successfully");
-
-        const savedData = { ...data, images };
-        setFormData(savedData);
+      if (response.status >= 200 && response.status <= 300) {
+        console.log("Car added successfully");
+        setFormData({ ...data, images, imagesCount: images.length });
+        resetForm();
       } else {
-        message.error("Failed to add car");
+        throw new Error("Failed to add car");
       }
     } catch (error) {
-      message.error("Error occurred while adding car");
+      console.error(error.message || "Error occurred while adding car");
     }
   };
 
@@ -99,15 +97,29 @@ const Car = () => {
   ];
 
   return (
-    <div style={{ width: "60%", margin: "auto", padding: "20px" }}>
-      <form onSubmit={handleSubmit(handleOnFormSubmit)}>
+    <>
+      <Form
+        name="basic"
+        labelCol={{
+          span: 8,
+        }}
+        wrapperCol={{
+          span: 16,
+        }}
+        style={{ width: "60%", margin: "auto", padding: "20px" }}
+        onFinish={handleSubmit(handleOnFormSubmit)}
+      >
         <Form.Item label="Car Model">
           <Controller
             control={control}
             name="model"
-            rules={{ required: "Car model is required" }}
-            render={({ field }) => (
-              <Input placeholder="Enter car model" {...field} />
+            rules={[{ required: "Car model is required" }]}
+            render={({ field, fieldState }) => (
+              <Input
+                placeholder="Enter car model"
+                {...field}
+                status={fieldState.invalid ? "error" : ""}
+              />
             )}
           />
         </Form.Item>
@@ -117,8 +129,12 @@ const Car = () => {
             control={control}
             name="price"
             rules={{ required: "Price is required" }}
-            render={({ field }) => (
-              <Input placeholder="Enter car price" {...field} />
+            render={({ field, fieldState }) => (
+              <Input
+                placeholder="Enter car price"
+                {...field}
+                status={fieldState.invalid ? "error" : ""}
+              />
             )}
           />
         </Form.Item>
@@ -128,8 +144,12 @@ const Car = () => {
             control={control}
             name="phoneNumber"
             rules={{ required: "Phone number is required" }}
-            render={({ field }) => (
-              <Input placeholder="Enter phone number" {...field} />
+            render={({ field, fieldState }) => (
+              <Input
+                placeholder="Enter phone number"
+                {...field}
+                status={fieldState.invalid ? "error" : ""}
+              />
             )}
           />
         </Form.Item>
@@ -138,7 +158,6 @@ const Car = () => {
           <Controller
             control={control}
             name="city"
-            rules={{ required: "City is required" }}
             defaultValue="Lahore"
             render={({ field }) => (
               <Radio.Group {...field}>
@@ -152,7 +171,7 @@ const Car = () => {
         <Form.Item label="Number of Images">
           <Select
             defaultValue={1}
-            onChange={setImageCount}
+            onChange={(value) => setImageCount(value)}
             style={{ width: 120 }}
           >
             {[...Array(10).keys()].map((_, i) => (
@@ -190,21 +209,15 @@ const Car = () => {
             </Form.Item>
           )}
         />
-
         <Form.Item>
-          <Button
-            onClick={() => openNotificationWithIcon("success")}
-            type="primary"
-            htmlType="submit"
-          >
+          <Button type="primary" htmlType="submit">
             Add Car
           </Button>
         </Form.Item>
-      </form>
+      </Form>
 
-      {/* Show Table after successful submission */}
       {formData && (
-        <div style={{ marginTop: "20px" }}>
+        <div style={{ margin: "40px" }}>
           <h3>Form Data in Table:</h3>
           <Table
             dataSource={[formData]}
@@ -214,7 +227,7 @@ const Car = () => {
           />
         </div>
       )}
-    </div>
+    </>
   );
 };
 
